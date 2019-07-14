@@ -1,13 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'lib-google-cloud-speech-recognition',
-  template: `
-    <p>
-      google-cloud-speech-recognition works!
-    </p>
-  `,
-  styles: []
+  selector: 'gcsr-component',
+  templateUrl: './google-cloud-speech-recognition.component.html',
+  styleUrls: ['./google-cloud-speech-recognition.component.scss']
 })
 export class GoogleCloudSpeechRecognitionComponent implements OnInit {
 

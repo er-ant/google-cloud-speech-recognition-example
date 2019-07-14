@@ -7,7 +7,13 @@
       "projectType": "library",
       "root": "projects/google-cloud-speech-recognition",
       "sourceRoot": "projects/google-cloud-speech-recognition/src",
-      "prefix": "lib",
+      "prefix": "gcsr",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss",
+          "skipTests": true
+        },
+      },
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-ng-packagr:build",
