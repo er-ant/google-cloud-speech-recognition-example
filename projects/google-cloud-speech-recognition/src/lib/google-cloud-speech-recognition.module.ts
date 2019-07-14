@@ -1,12 +1,15 @@
 import { NgModule } from '@angular/core';
+
 import { GoogleCloudSpeechRecognitionComponent } from './google-cloud-speech-recognition.component';
 
-
-
 @NgModule({
-  declarations: [GoogleCloudSpeechRecognitionComponent],
+  declarations: [
+    GoogleCloudSpeechRecognitionComponent
+  ],
   imports: [
   ],
-  exports: [GoogleCloudSpeechRecognitionComponent]
+  exports: [
+    GoogleCloudSpeechRecognitionComponent
+  ]
 })
 export class GoogleCloudSpeechRecognitionModule { }

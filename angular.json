@@ -37,6 +37,142 @@
           }
         }
       }
+    },
+    "google-cloud-speech-recognition-example": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss",
+          "skipTests": true
+        },
+        "@schematics/angular:class": {
+          "skipTests": true
+        },
+        "@schematics/angular:directive": {
+          "skipTests": true
+        },
+        "@schematics/angular:guard": {
+          "skipTests": true
+        },
+        "@schematics/angular:module": {
+          "skipTests": true
+        },
+        "@schematics/angular:pipe": {
+          "skipTests": true
+        },
+        "@schematics/angular:service": {
+          "skipTests": true
+        }
+      },
+      "root": "projects/google-cloud-speech-recognition-example",
+      "sourceRoot": "projects/google-cloud-speech-recognition-example/src",
+      "prefix": "gcsr-example",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/google-cloud-speech-recognition-example",
+            "index": "projects/google-cloud-speech-recognition-example/src/index.html",
+            "main": "projects/google-cloud-speech-recognition-example/src/main.ts",
+            "polyfills": "projects/google-cloud-speech-recognition-example/src/polyfills.ts",
+            "tsConfig": "projects/google-cloud-speech-recognition-example/tsconfig.app.json",
+            "aot": false,
+            "assets": [
+              "projects/google-cloud-speech-recognition-example/src/favicon.ico",
+              "projects/google-cloud-speech-recognition-example/src/assets"
+            ],
+            "styles": [
+              "projects/google-cloud-speech-recognition-example/src/styles.scss"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/google-cloud-speech-recognition-example/src/environments/environment.ts",
+                  "with": "projects/google-cloud-speech-recognition-example/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "google-cloud-speech-recognition-example:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "google-cloud-speech-recognition-example:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "google-cloud-speech-recognition-example:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/google-cloud-speech-recognition-example/src/test.ts",
+            "polyfills": "projects/google-cloud-speech-recognition-example/src/polyfills.ts",
+            "tsConfig": "projects/google-cloud-speech-recognition-example/tsconfig.spec.json",
+            "karmaConfig": "projects/google-cloud-speech-recognition-example/karma.conf.js",
+            "assets": [
+              "projects/google-cloud-speech-recognition-example/src/favicon.ico",
+              "projects/google-cloud-speech-recognition-example/src/assets"
+            ],
+            "styles": [
+              "projects/google-cloud-speech-recognition-example/src/styles.scss"
+            ],
+            "scripts": []
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/google-cloud-speech-recognition-example/tsconfig.app.json",
+              "projects/google-cloud-speech-recognition-example/tsconfig.spec.json",
+              "projects/google-cloud-speech-recognition-example/e2e/tsconfig.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        },
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/google-cloud-speech-recognition-example/e2e/protractor.conf.js",
+            "devServerTarget": "google-cloud-speech-recognition-example:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "google-cloud-speech-recognition-example:serve:production"
+            }
+          }
+        }
+      }
     }},
   "defaultProject": "google-cloud-speech-recognition"
 }
