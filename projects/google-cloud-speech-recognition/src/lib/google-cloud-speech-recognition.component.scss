@@ -1,3 +1,65 @@
-p {
-  color: red;
+:host {
+  height: 500px;
+  margin: auto;
+  width: 300px;
+}
+
+.recognition-header,
+.recognition-configs {
+  margin-bottom: 15px;
+}
+
+.recognition-header {
+  display: flex;
+  background-color: #e4da92;
+
+  &__source {
+    flex-grow: 1;
+    font-size: 20px;
+    padding: 10px;
+    text-align: center;
+
+    &_active {
+      background-color: #d6bf7e;
+    }
+
+    &:not(&_active) {
+      cursor: pointer;
+    }
+  }
+}
+
+.recognition-config {
+  &__language {
+    position: relative;
+
+
+    &-dropdown {
+      cursor: pointer;
+      position: absolute;
+      width: 100%;
+
+      &-label {
+        background-color: beige;
+        border-radius: 4px;
+        border: 1px solid #e4da92;
+        font-size: 18px;
+        padding: 10px 5px;
+      }
+
+      &-item {
+        background-color: #f9f4ce;
+        cursor: pointer;
+        padding: 10px 5px;
+
+        &:hover {
+          background-color: #cfe8a5;
+        }
+
+        &_active {
+          background-color: #cfe8a5;
+        }
+      }
+    }
+  }
 }

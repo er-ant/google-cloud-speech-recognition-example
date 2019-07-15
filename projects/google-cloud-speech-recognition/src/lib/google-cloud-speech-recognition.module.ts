@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import { GoogleCloudSpeechRecognitionComponent } from './google-cloud-speech-recognition.component';
 
@@ -7,6 +8,7 @@ import { GoogleCloudSpeechRecognitionComponent } from './google-cloud-speech-rec
     GoogleCloudSpeechRecognitionComponent
   ],
   imports: [
+    CommonModule
   ],
   exports: [
     GoogleCloudSpeechRecognitionComponent

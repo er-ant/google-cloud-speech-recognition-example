@@ -1,3 +1,30 @@
-<p>
-  google-cloud-speech-recognition works!
-</p>
+<div class="recognition-header">
+  <div class="recognition-header__source" [class.recognition-header__source_active]="currentSoundSource === 'micro'"
+       (click)="changeSoundSource('micro')">
+    MICROPHONE
+  </div>
+  <div class="recognition-header__source" [class.recognition-header__source_active]="currentSoundSource === 'upload'"
+       (click)="changeSoundSource('upload')">
+    FILE UPLOAD
+  </div>
+</div>
+<div class="recognition-configs">
+  <div class="recognition-config recognition-config__language">
+    <div class="recognition-config__language-dropdown-label" (click)="toggleLanguagesDropdown()">
+      {{currentLanguage.label}}
+    </div>
+    <div class="recognition-config__language-dropdown" *ngIf="languagesDropdownOpened" (click)="toggleLanguagesDropdown()">
+      <div class="recognition-config__language-dropdown-item" [class.recognition-config__language-dropdown-item_active]="currentLanguage.key === language.key"
+           *ngFor="let language of availableLanguages" [title]="language.label" (click)="chooseLanguage(language)">
+        {{language.label}}
+      </div>
+    </div>
+  </div>
+  <div class="recognition-config recognition-config__punctuation">
+  </div>
+</div>
+<div class="recognition-actions">
+  <button class="recognition-actions__button_process">
+    {{currentSoundSource === 'micro' ? 'START RECORDING' : 'CHOOSE FILE'}}
+  </button>
+</div>
