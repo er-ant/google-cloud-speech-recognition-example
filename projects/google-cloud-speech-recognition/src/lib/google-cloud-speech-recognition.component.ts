@@ -1,4 +1,7 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Input, Output, EventEmitter } from '@angular/core';
+
+import { ReplaySubject, Observable, timer } from 'rxjs';
+import { takeUntil, map, take } from 'rxjs/operators';
 
 type SoundSource = 'micro' | 'upload';
 
@@ -13,7 +16,7 @@ export interface IRecognitionLanguage {
   styleUrls: ['./google-cloud-speech-recognition.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GoogleCloudSpeechRecognitionComponent implements OnInit {
+export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy {
 
   @Input() history: boolean = true;
   @Input() checkRecognition: boolean = true;
@@ -22,9 +25,14 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit {
 
   private readonly availableLanguages: Array<IRecognitionLanguage>;
 
+  private unsubscribe$: ReplaySubject<any> = new ReplaySubject(1);
+
+  recordingTimer: Observable<string>;
+
   currentSoundSource: SoundSource = 'micro';
   currentLanguage: IRecognitionLanguage;
 
+  isRecording: boolean = false;
   languagesDropdownOpened: boolean = false;
 
   constructor(private cdRef: ChangeDetectorRef) {
@@ -48,6 +56,11 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe$.next(null);
+    this.unsubscribe$.complete();
   }
 
   /**
@@ -75,5 +88,50 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit {
   toggleLanguagesDropdown(): void {
     this.languagesDropdownOpened = !this.languagesDropdownOpened;
     this.cdRef.detectChanges();
+  }
+
+  /**
+   * @method startRecording
+   * Starts or stops audio recording
+   */
+  startRecording(): void {
+    if (!this.isRecording) {
+      this.isRecording = true;
+      this.recordingTimer = timer(0, 1000)
+        .pipe(
+          map((index: number) => {
+            return index + 1 + '';
+          }),
+          take(30)
+        );
+      this.cdRef.detectChanges();
+
+      // var player: HTMLAudioElement = <HTMLAudioElement>document.getElementById('player');
+
+      // var handleSuccess = function(stream) {
+      //   console.log(stream);
+      //   var context = new AudioContext();
+      //   var source = context.createMediaStreamSource(stream);
+      //   var processor = context.createScriptProcessor(1024, 1, 1);
+      //   var analyzer = context.createAnalyser();
+
+      //   source.connect(processor);
+      //   processor.connect(context.destination);
+
+      //   processor.onaudioprocess = function(e) {
+      //     // Do something with the data, i.e Convert this to WAV
+      //     console.log(e.inputBuffer);
+      //   };
+      // };
+
+      // navigator.mediaDevices
+      //   .getUserMedia({ audio: true, video: false })
+      //   .then(handleSuccess)
+      //   .catch(err => console.log(err));
+    } else {
+      this.isRecording = false;
+      this.recordingTimer = null;
+      this.cdRef.detectChanges();
+    }
   }
 }

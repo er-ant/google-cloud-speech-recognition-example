@@ -27,14 +27,16 @@
 
   <ng-container *ngSwitchCase="'micro'">
     <div class="recognition-body">
-      <div class="recognition-body__micro"></div>
+      <div class="recognition-body__micro">
+        <!-- <audio id="player" controls></audio> -->
+      </div>
       <div class="recognition-body__timer">
-        00:00 / 00:30
+        00:{{recordingTimer && (recordingTimer | async) ? ((recordingTimer | async) | number: '2.0-0'): '00'}} / 00:30
       </div>
     </div>
     <div class="recognition-actions">
-      <button class="recognition-actions__button_process" *ngSwitchCase="'micro'">
-        START RECORDING
+      <button class="recognition-actions__button_process" *ngSwitchCase="'micro'" (click)="startRecording()">
+        {{isRecording ? 'STOP RECORDING' : 'START RECORDING'}}
       </button>
     </div>
   </ng-container>
