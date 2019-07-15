@@ -23,8 +23,27 @@
   <div class="recognition-config recognition-config__punctuation">
   </div>
 </div>
-<div class="recognition-actions">
-  <button class="recognition-actions__button_process">
-    {{currentSoundSource === 'micro' ? 'START RECORDING' : 'CHOOSE FILE'}}
-  </button>
-</div>
+<ng-container [ngSwitch]="currentSoundSource">
+
+  <ng-container *ngSwitchCase="'micro'">
+    <div class="recognition-body">
+      <div class="recognition-body__micro"></div>
+      <div class="recognition-body__timer">
+        00:00 / 00:30
+      </div>
+    </div>
+    <div class="recognition-actions">
+      <button class="recognition-actions__button_process" *ngSwitchCase="'micro'">
+        START RECORDING
+      </button>
+    </div>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="'upload'">
+    <div class="recognition-actions">
+      <button class="recognition-actions__button_process" *ngSwitchCase="'upload'">
+        UPLOAD FILE
+      </button>
+    </div>
+  </ng-container>
+</ng-container>
