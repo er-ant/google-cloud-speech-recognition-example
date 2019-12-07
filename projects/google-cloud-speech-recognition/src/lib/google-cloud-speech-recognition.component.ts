@@ -1,7 +1,9 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, Input, Output, EventEmitter } from '@angular/core';
 
-import { ReplaySubject, Observable, timer } from 'rxjs';
-import { takeUntil, map, take } from 'rxjs/operators';
+import { ReplaySubject, Observable, timer, from } from 'rxjs';
+import { takeWhile, tap, take, finalize } from 'rxjs/operators';
+
+declare var MediaRecorder: any;
 
 type SoundSource = 'micro' | 'upload';
 
@@ -27,13 +29,17 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
 
   private unsubscribe$: ReplaySubject<any> = new ReplaySubject(1);
 
-  recordingTimer: Observable<string>;
+  recordingTimer: Observable<number>;
 
   currentSoundSource: SoundSource = 'micro';
   currentLanguage: IRecognitionLanguage;
+  currentSeconds: number;
 
   isRecording: boolean = false;
   languagesDropdownOpened: boolean = false;
+
+  mediaRecorder: any;
+  mediaStream: MediaStream;
 
   constructor(private cdRef: ChangeDetectorRef) {
     this.availableLanguages = [
@@ -95,43 +101,58 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
    * Starts or stops audio recording
    */
   startRecording(): void {
-    if (!this.isRecording) {
-      this.isRecording = true;
-      this.recordingTimer = timer(0, 1000)
-        .pipe(
-          map((index: number) => {
-            return index + 1 + '';
-          }),
-          take(30)
-        );
-      this.cdRef.detectChanges();
+    from(navigator.mediaDevices.getUserMedia({audio: true, video: false}))
+      .subscribe(
+        (mediaStream: MediaStream) => {
+          this.mediaStream = mediaStream;
+          this.isRecording = true;
 
-      // var player: HTMLAudioElement = <HTMLAudioElement>document.getElementById('player');
+          this.recordingTimer = timer(0, 1000)
+            .pipe(
+              take(30),
+              takeWhile(() => !!this.recordingTimer),
+              tap((index: number) => {
+                this.currentSeconds = index + 1;
+                this.cdRef.detectChanges();
+                // return index + 1 + '';
+              }),
+              finalize(() => {
+                this.stopRecording();
+              })
+            );
+          this.recordingTimer.subscribe();
 
-      // var handleSuccess = function(stream) {
-      //   console.log(stream);
-      //   var context = new AudioContext();
-      //   var source = context.createMediaStreamSource(stream);
-      //   var processor = context.createScriptProcessor(1024, 1, 1);
-      //   var analyzer = context.createAnalyser();
 
-      //   source.connect(processor);
-      //   processor.connect(context.destination);
+          this.cdRef.detectChanges();
 
-      //   processor.onaudioprocess = function(e) {
-      //     // Do something with the data, i.e Convert this to WAV
-      //     console.log(e.inputBuffer);
-      //   };
-      // };
+          this.mediaRecorder = new MediaRecorder(mediaStream);
+          this.mediaRecorder.start();
 
-      // navigator.mediaDevices
-      //   .getUserMedia({ audio: true, video: false })
-      //   .then(handleSuccess)
-      //   .catch(err => console.log(err));
-    } else {
-      this.isRecording = false;
-      this.recordingTimer = null;
-      this.cdRef.detectChanges();
-    }
+          const audioChunks: Array<Blob> = [];
+
+          this.mediaRecorder.addEventListener('dataavailable', (event: any) => audioChunks.push(event.data));
+
+          this.mediaRecorder.addEventListener('stop', () => {
+            const audioBlob = new Blob(audioChunks);
+          });
+        },
+        (err: DOMException) => console.log(err.message)
+      );
+  }
+
+  /**
+   * @method stopRecording
+   * Stops recording
+   */
+  stopRecording(): void {
+    console.log('hi');
+    this.currentSeconds = 0;
+    this.isRecording = false;
+    this.recordingTimer = null;
+    this.recordingTimer
+    this.mediaRecorder.stop();
+    this.mediaStream.getAudioTracks().forEach((track: MediaStreamTrack) => track.stop());
+    this.mediaStream = undefined;
+    this.cdRef.detectChanges();
   }
 }
