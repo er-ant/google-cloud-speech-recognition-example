@@ -1,48 +1,39 @@
 <div class="recognition-header">
-  <div class="recognition-header__source" [class.recognition-header__source_active]="currentSoundSource === 'micro'"
-       (click)="changeSoundSource('micro')">
-    MICROPHONE
-  </div>
-  <div class="recognition-header__source" [class.recognition-header__source_active]="currentSoundSource === 'upload'"
-       (click)="changeSoundSource('upload')">
-    FILE UPLOAD
+  <div class="recognition-header__source" *ngFor="let soundSource of availableSoundSources" (click)="changeSoundSource(soundSource)"
+       [class.recognition-header__source_active]="currentSoundSource === soundSource">
+    {{ soundSource.label }}
   </div>
 </div>
 <div class="recognition-configs">
   <div class="recognition-config recognition-config__language">
     <div class="recognition-config__language-dropdown-label" (click)="toggleLanguagesDropdown()">
-      {{currentLanguage.label}}
+      {{ currentLanguage.label }}
     </div>
     <div class="recognition-config__language-dropdown" *ngIf="languagesDropdownOpened" (click)="toggleLanguagesDropdown()">
-      <div class="recognition-config__language-dropdown-item" [class.recognition-config__language-dropdown-item_active]="currentLanguage.key === language.key"
-           *ngFor="let language of availableLanguages" [title]="language.label" (click)="chooseLanguage(language)">
-        {{language.label}}
+      <div class="recognition-config__language-dropdown-item" *ngFor="let language of availableLanguages" [title]="language.label"
+           (click)="chooseLanguage(language)" [class.recognition-config__language-dropdown-item_active]="currentLanguage === language">
+        {{ language.label }}
       </div>
     </div>
   </div>
   <div class="recognition-config recognition-config__punctuation">
   </div>
 </div>
-<ng-container [ngSwitch]="currentSoundSource">
 
+<ng-container [ngSwitch]="currentSoundSource.key">
   <ng-container *ngSwitchCase="'micro'">
     <div class="recognition-body">
       <div class="recognition-body__micro">
         <!-- <audio id="player" controls></audio> -->
       </div>
       <div class="recognition-body__timer">
-        00:{{currentSeconds ? (currentSeconds | number: '2.0-0'): '00'}} / 00:30
+        {{currentShortRecordingSeconds}} 00:{{ (currentShortRecordingSeconds || currentShortRecordingSeconds === 0) ? (currentShortRecordingSeconds | number: '2.0-0') : '00' }} / 00:30
       </div>
     </div>
     <div class="recognition-actions">
-      <ng-container [ngSwitch]="isRecording">
-        <button class="recognition-actions__button_process" *ngSwitchCase="false" (click)="startRecording()">
-          START RECORDING
-        </button>
-        <button class="recognition-actions__button_process" *ngSwitchCase="true" (click)="stopRecording()">
-          STOP RECORDING
-        </button>
-      </ng-container>
+      <button class="recognition-actions__button_process" (click)="processShortRecording()">
+        {{ isShortRecording ? 'STOP RECORDING' : 'START RECORDING' }}
+      </button>
     </div>
   </ng-container>
 
