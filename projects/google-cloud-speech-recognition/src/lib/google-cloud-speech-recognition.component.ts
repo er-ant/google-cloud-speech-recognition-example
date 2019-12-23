@@ -3,29 +3,21 @@ import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRe
 import { ReplaySubject, Observable, timer, from, Subscription } from 'rxjs';
 import { takeUntil, tap, take } from 'rxjs/operators';
 
-export const SHORT_RECORD_MAXIMUM: number = 30;
+import RecordRTC from 'recordrtc/RecordRTC.min';
 
-export const SOUND_SOURCES: Array<ISoundSource> = [
-  {
-    key: 'micro',
-    label: 'MICROPHONE'
-  }, {
-    key: 'upload',
-    label: 'FILE UPLOAD'
-  }
-]
+import { GoogleCloudSpeechRecognitionService } from './google-cloud-speech-recognition.service';
 
-export interface ISoundSource {
-  key: SoundSource;
-  label: string;
-}
+import { ISoundSource, IRecognitionLanguage, IProcessError, IGCRSError, IGCSRResult } from './google-cloud-speech-recognition.models';
 
-type SoundSource = 'micro' | 'upload';
+import { SHORT_RECORD_MAXIMUM, SOUND_SOURCES } from './google-cloud-speech-recognition.constants';
 
-export interface IRecognitionLanguage {
-  key: string;
-  label: string;
-}
+export const RTC_RECORD_CONFIG = {
+  recorderType: RecordRTC.StereoAudioRecorder,
+  type: 'audio',
+  mimeType: 'audio/wav',
+  sampleRate: 48000,
+  numberOfAudioChannels: 2
+};
 
 @Component({
   selector: 'gcsr-component',
@@ -35,12 +27,12 @@ export interface IRecognitionLanguage {
 })
 export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy {
 
-  // @Input() history: boolean = true;
-  // @Input() checkRecognition: boolean = true;
-
-  @Output() recognitionResult: EventEmitter<any> = new EventEmitter();
+  @Output() recognitionResults: EventEmitter<Array<IGCSRResult>> = new EventEmitter();
+  @Output() errorHandler: EventEmitter<IProcessError> = new EventEmitter();
 
   private unsubscribe$: ReplaySubject<any> = new ReplaySubject(1);
+
+  private recordRTC: any;
 
   readonly availableSoundSources: Array<ISoundSource> = SOUND_SOURCES;
   availableLanguages: Array<IRecognitionLanguage>;
@@ -54,10 +46,26 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
   isShortRecording: boolean = false;
   languagesDropdownOpened: boolean = false;
 
-  mediaRecorder: any;
   mediaStream: MediaStream;
 
-  constructor(private cdRef: ChangeDetectorRef) {
+  constructor(private cdRef: ChangeDetectorRef,
+              private gcsrService: GoogleCloudSpeechRecognitionService) {
+    this.setLanguages();
+  }
+
+  ngOnInit() {
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe$.next(null);
+    this.unsubscribe$.complete();
+  }
+
+  /**
+   * @method setLanguages
+   * Sets languages and current language
+   */
+  private setLanguages(): void {
     this.availableLanguages = [
       {
         key: 'en-GB',
@@ -77,14 +85,6 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
     this.currentLanguage = this.availableLanguages[0];
   }
 
-  ngOnInit() {
-  }
-
-  ngOnDestroy() {
-    this.unsubscribe$.next(null);
-    this.unsubscribe$.complete();
-  }
-
   /**
    * @method startShortRecording
    * Starts recording short audio
@@ -94,6 +94,11 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(
         (mediaStream: MediaStream) => {
+          // Used RecordRTC with StereoAudioRecorder lib as another libs cannot provide audio/wav format
+          // MediaStream always provide audio/webm
+          this.recordRTC = RecordRTC(mediaStream, RTC_RECORD_CONFIG);
+          this.recordRTC.startRecording();
+
           this.mediaStream = mediaStream;
           this.isShortRecording = true;
 
@@ -110,21 +115,14 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
               })
             )
             .subscribe();
-
-          this.mediaRecorder = new MediaRecorder(this.mediaStream);
-          this.mediaRecorder.start();
-
-          const audioChunks: Array<Blob> = [];
-
-          this.mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
-            audioChunks.push(event.data);
-          });
-
-          this.mediaRecorder.addEventListener('stop', () => {
-            const audioBlob = new Blob(audioChunks);
-          });
         },
-        (err: DOMException) => console.log(err.message)
+        (error: DOMException) => {
+          const errorOutput: IProcessError = {
+            name: 'MEDIA_ERROR',
+            message: error.message
+          };
+          this.errorHandler.next(errorOutput);
+        }
       );
   }
 
@@ -136,10 +134,45 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
     this.currentShortRecordingSeconds = 0;
     this.isShortRecording = false;
     this.recordingTimer.unsubscribe();
-    this.mediaRecorder.stop();
-    this.mediaStream.getAudioTracks().forEach((track: MediaStreamTrack) => track.stop());
-    this.mediaStream = undefined;
+    this.recordRTC.stopRecording(() => {
+      const reader: FileReader = new FileReader();
+      reader.readAsDataURL(this.recordRTC.getBlob());
+      reader.onloadend = ((base64Data: ProgressEvent) => {
+        const preparedBase64Data: string = (reader.result as string).replace('data:audio/wav;base64,', '');
+        this.googleProcessShortRecord(preparedBase64Data);
+      });
+
+      this.mediaStream.getAudioTracks().forEach((track: MediaStreamTrack) => track.stop());
+      this.mediaStream = undefined;
+    });
     this.cdRef.detectChanges();
+  }
+
+  /**
+   * @method googleProcessShortRecord
+   * Processes short record with google
+   */
+  googleProcessShortRecord(base64Data: string): void {
+    this.gcsrService
+      .sendToGoogleShortRecord(
+        {
+          sampleRateHertz: RTC_RECORD_CONFIG.sampleRate,
+         "enableWordTimeOffsets": false,
+         "audioChannelCount": 2,
+         "encoding":"LINEAR16",
+         languageCode: this.currentLanguage.key,
+        }, base64Data)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(
+        (results: Array<IGCSRResult>) => this.recognitionResults.next(results),
+        (error: IGCRSError) => {
+          const errorOutput: IProcessError = {
+            name: 'GCSR_ERROR',
+            message: error.message
+          };
+          this.errorHandler.next(errorOutput);
+        }
+      );
   }
 
   /**
