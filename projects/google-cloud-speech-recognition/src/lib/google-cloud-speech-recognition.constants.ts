@@ -1,8 +1,30 @@
-import { ISoundSource, IRecognitionLanguage } from './google-cloud-speech-recognition.models';
+import RecordRTC from 'recordrtc/RecordRTC.min';
+
+import { ISoundSource, IRecognitionLanguage, IRTCConfigs, IGCSRConfigs } from './google-cloud-speech-recognition.models';
+
+export const DEFAULT_RTC_CONFIGS: IRTCConfigs = {
+  recorderType: RecordRTC.StereoAudioRecorder,
+  type: 'audio' as const,
+  mimeType: 'audio/wav',
+  sampleRate: 44100,
+  numberOfAudioChannels: 2,
+  timeSlice: 500
+};
+
+export const DEFAULT_GCSR_CONFIGS: IGCSRConfigs = {
+  maxAlternatives: 5,
+  sampleRateHertz: 44100,
+  enableSeparateRecognitionPerChannel: false,
+  profanityFilter: false,
+  enableWordTimeOffsets: false,
+  audioChannelCount: 2,
+  encoding:'LINEAR16',
+  languageCode: 'en-GB'
+};
 
 export const SHORT_RECORD_MAXIMUM: number = 30;
 
-export const SOUND_SOURCES: Array<ISoundSource> = [
+export const DEFAULT_SOUND_SOURCES: Array<ISoundSource> = [
   {
     key: 'microrecord',
     label: 'SHORT RECORD'
@@ -12,7 +34,7 @@ export const SOUND_SOURCES: Array<ISoundSource> = [
   }
 ]
 
-export const AVAILABLE_LANGUAGES: Array<IRecognitionLanguage> = [
+export const DEFAULT_AVAILABLE_LANGUAGES: Array<IRecognitionLanguage> = [
   {
     key: 'en-GB',
     label: 'English'

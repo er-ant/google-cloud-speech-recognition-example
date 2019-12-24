@@ -40,7 +40,7 @@ export interface IGCSRConfigs {
   useEnhanced?: boolean;
 }
 
-export interface IRecordRTCConfigs {
+export interface IRTCConfigs {
   type: 'audio' | 'video' | 'canvas' | 'gif';
   // audio/webm
   // video/webm;codecs=vp9
@@ -57,53 +57,53 @@ export interface IRecordRTCConfigs {
   // CanvasRecorder, GifRecorder, WhammyRecorder
   recorderType: any;
   // disable logs
-  disableLogs: boolean;
+  disableLogs?: boolean;
   // get intervals based blobs
   // value in milliseconds
-  timeSlice: number;
+  timeSlice?: number;
   // requires timeSlice above
   // returns blob via callback function
-  ondataavailable: (blob) => {};
+  ondataavailable?: (blob) => {};
   // auto stop recording if camera stops
-  checkForInactiveTracks: boolean,
+  checkForInactiveTracks?: boolean,
   // requires timeSlice above
-  onTimeStamp: (timestamp) => {};
+  onTimeStamp?: (timestamp) => {};
   // both for audio and video tracks
-  bitsPerSecond: number;
+  bitsPerSecond?: number;
   // only for audio track
-  audioBitsPerSecond: number;
+  audioBitsPerSecond?: number;
   // only for video track
-  videoBitsPerSecond: number;
+  videoBitsPerSecond?: number;
   // used by CanvasRecorder and WhammyRecorder
   // it is kind of a "frameRate"
-  frameInterval: number;
+  frameInterval?: number;
   // if you are recording multiple streams into single file
   // this helps you see what is being recorded
-  previewStream: (stream) => {};
+  previewStream?: (stream) => {};
   // used by CanvasRecorder and WhammyRecorder
   // you can pass {width:640, height: 480} as well
-  video: HTMLVideoElement;
+  video?: HTMLVideoElement;
   // used by CanvasRecorder and WhammyRecorder
-  canvas: object;
+  canvas?: object;
   // used by StereoAudioRecorder
   // the range 22050 to 96000.
   sampleRate: number;
   // used by StereoAudioRecorder
   // the range 22050 to 96000.
   // let us force 16khz recording:
-  desiredSampRate: number;
+  desiredSampRate?: number;
   // used by StereoAudioRecorder
   // Legal values are (256, 512, 1024, 2048, 4096, 8192, 16384).
-  bufferSize: number;
+  bufferSize?: number;
   // used by StereoAudioRecorder
   // 1 or 2
   numberOfAudioChannels: number;
   // used by WebAssemblyRecorder
-  frameRate: number;
+  frameRate?: number;
   // used by WebAssemblyRecorder
-  bitrate: number;
+  bitrate?: number;
   // used by MultiStreamRecorder - to access HTMLCanvasElement
-  elementClass: string;
+  elementClass?: string;
 }
 
 /* GCSR Requests Responses bodies */

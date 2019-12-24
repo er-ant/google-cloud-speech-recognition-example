@@ -8,18 +8,12 @@ import RecordRTC from 'recordrtc/RecordRTC.min';
 import { GoogleCloudSpeechRecognitionService } from './google-cloud-speech-recognition.service';
 
 import {
-  ISoundSource, IRecognitionLanguage, IProcessError, IGCRSError, IRecognitionResults
+  ISoundSource, IRecognitionLanguage, IProcessError, IGCRSError, IRecognitionResults, IRTCConfigs, IGCSRConfigs
 } from './google-cloud-speech-recognition.models';
 
-import { SHORT_RECORD_MAXIMUM, SOUND_SOURCES, AVAILABLE_LANGUAGES } from './google-cloud-speech-recognition.constants';
-
-export const RTC_RECORD_CONFIG = {
-  recorderType: RecordRTC.StereoAudioRecorder,
-  type: 'audio',
-  mimeType: 'audio/wav',
-  sampleRate: 48000,
-  numberOfAudioChannels: 2
-};
+import {
+  SHORT_RECORD_MAXIMUM, DEFAULT_SOUND_SOURCES, DEFAULT_AVAILABLE_LANGUAGES, DEFAULT_RTC_CONFIGS, DEFAULT_GCSR_CONFIGS
+} from './google-cloud-speech-recognition.constants';
 
 @Component({
   selector: 'gcsr-component',
@@ -29,8 +23,10 @@ export const RTC_RECORD_CONFIG = {
 })
 export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy {
 
-  @Input() availableSoundSources: Array<ISoundSource> = SOUND_SOURCES;
-  @Input() availableLanguages: Array<IRecognitionLanguage> = AVAILABLE_LANGUAGES;
+  @Input() availableSoundSources: Array<ISoundSource> = DEFAULT_SOUND_SOURCES;
+  @Input() availableLanguages: Array<IRecognitionLanguage> = DEFAULT_AVAILABLE_LANGUAGES;
+  @Input() RTCConfigs: IRTCConfigs = DEFAULT_RTC_CONFIGS;
+  @Input() GCSRConfigs: IGCSRConfigs = DEFAULT_GCSR_CONFIGS;
 
   @Output() recognitionResults: EventEmitter<Array<IRecognitionResults>> = new EventEmitter();
   @Output() errorHandler: EventEmitter<IProcessError> = new EventEmitter();
@@ -53,7 +49,7 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
   currentShortRecordingSeconds: number;
 
   constructor(private cdRef: ChangeDetectorRef,
-              private gcsrService: GoogleCloudSpeechRecognitionService) {
+              private GCSRService: GoogleCloudSpeechRecognitionService) {
     this.currentLanguage = this.availableLanguages[0];
   }
 
@@ -76,7 +72,7 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
         (mediaStream: MediaStream) => {
           // Used RecordRTC with StereoAudioRecorder lib as another libs cannot provide audio/wav format
           // MediaStream always provide audio/webm
-          this.recordRTC = RecordRTC(mediaStream, RTC_RECORD_CONFIG);
+          this.recordRTC = RecordRTC(mediaStream, this.RTCConfigs);
           this.recordRTC.startRecording();
 
           this.mediaStream = mediaStream;
@@ -148,16 +144,9 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
    * Processes short record with google
    * @method googleProcessShortRecord
    */
-  googleProcessShortRecord(base64Data: string): void {
-    this.gcsrService
-      .sendToGoogleShortRecord(
-        {
-          sampleRateHertz: RTC_RECORD_CONFIG.sampleRate,
-         "enableWordTimeOffsets": false,
-         "audioChannelCount": 2,
-         "encoding":"LINEAR16",
-         languageCode: this.currentLanguage.key,
-        }, base64Data)
+  private googleProcessShortRecord(base64Data: string): void {
+    this.GCSRService
+      .sendToGoogleShortRecord(this.GCSRConfigs, base64Data)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(
         (results: Array<IRecognitionResults>) => this.recognitionResults.next(results),
