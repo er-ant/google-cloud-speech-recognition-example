@@ -151,6 +151,22 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
   }
 
   /**
+   * @method isAvailable
+   * Returns if component is available for actions otherwise emits errors
+   */
+  private isAvailable(): boolean {
+    if (this.isShortRecording) {
+      const errorOutput: IProcessError = {
+        name: 'COMPONENT_ERRORS',
+        message: 'Complete previous recording first!'
+      };
+
+      this.errorHandler.next(errorOutput);
+      return false;
+    }
+  }
+
+  /**
    * @method googleProcessShortRecord
    * Processes short record with google
    */
@@ -190,6 +206,10 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
    * Change current sound source
    */
   changeSoundSource(soundSource: ISoundSource): void {
+    if (this.isAvailable()) {
+      return;
+    }
+
     this.currentSoundSource = soundSource;
     this.cdRef.detectChanges();
   }
@@ -199,6 +219,10 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
    * Choose language for further recognition
    */
   chooseLanguage(language: IRecognitionLanguage): void {
+    if (this.isAvailable()) {
+      return;
+    }
+
     this.currentLanguage = language;
     this.toggleLanguagesDropdown();
   }
@@ -208,6 +232,10 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
    * Toggle languages dropdown
    */
   toggleLanguagesDropdown(): void {
+    if (this.isAvailable()) {
+      return;
+    }
+
     this.languagesDropdownOpened = !this.languagesDropdownOpened;
     this.cdRef.detectChanges();
   }
