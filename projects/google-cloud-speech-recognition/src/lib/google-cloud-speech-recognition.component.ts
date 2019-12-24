@@ -11,7 +11,7 @@ import {
   ISoundSource, IRecognitionLanguage, IProcessError, IGCRSError, IRecognitionResults
 } from './google-cloud-speech-recognition.models';
 
-import { SHORT_RECORD_MAXIMUM, SOUND_SOURCES } from './google-cloud-speech-recognition.constants';
+import { SHORT_RECORD_MAXIMUM, SOUND_SOURCES, AVAILABLE_LANGUAGES } from './google-cloud-speech-recognition.constants';
 
 export const RTC_RECORD_CONFIG = {
   recorderType: RecordRTC.StereoAudioRecorder,
@@ -30,6 +30,7 @@ export const RTC_RECORD_CONFIG = {
 export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy {
 
   @Input() availableSoundSources: Array<ISoundSource> = SOUND_SOURCES;
+  @Input() availableLanguages: Array<IRecognitionLanguage> = AVAILABLE_LANGUAGES;
 
   @Output() recognitionResults: EventEmitter<Array<IRecognitionResults>> = new EventEmitter();
   @Output() errorHandler: EventEmitter<IProcessError> = new EventEmitter();
@@ -38,7 +39,6 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
 
   private recordRTC: any;
 
-  availableLanguages: Array<IRecognitionLanguage>;
   currentLanguage: IRecognitionLanguage;
   languagesDropdownOpened: boolean = false;
 
@@ -54,7 +54,7 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
 
   constructor(private cdRef: ChangeDetectorRef,
               private gcsrService: GoogleCloudSpeechRecognitionService) {
-    this.setLanguages();
+    this.currentLanguage = this.availableLanguages[0];
   }
 
   ngOnInit() {
@@ -63,30 +63,6 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
   ngOnDestroy() {
     this.unsubscribe$.next(null);
     this.unsubscribe$.complete();
-  }
-
-  /**
-   * Sets languages and current language
-   * @method setLanguages
-   */
-  private setLanguages(): void {
-    this.availableLanguages = [
-      {
-        key: 'en-GB',
-        label: 'English'
-      }, {
-        key: 'ru-RU',
-        label: 'Русский'
-      }, {
-        key: 'eu-ES',
-        label: 'Euskara'
-      }, {
-        key: 'de-DE',
-        label: 'Deutsch'
-      }
-    ];
-
-    this.currentLanguage = this.availableLanguages[0];
   }
 
   /**
@@ -169,8 +145,8 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
   }
 
   /**
-   * @method googleProcessShortRecord
    * Processes short record with google
+   * @method googleProcessShortRecord
    */
   googleProcessShortRecord(base64Data: string): void {
     this.gcsrService
