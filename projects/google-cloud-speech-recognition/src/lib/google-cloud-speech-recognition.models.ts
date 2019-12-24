@@ -10,7 +10,7 @@ export interface ISoundSource {
 }
 
 export interface IProcessError {
-  name: 'MEDIA_ERROR' | 'GCSR_ERROR';
+  name: 'MEDIA_ERROR' | 'GCSR_ERROR' | 'COMPONENT_ERRORS';
   message: string;
 }
 

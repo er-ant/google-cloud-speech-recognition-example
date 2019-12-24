@@ -7,7 +7,9 @@ import RecordRTC from 'recordrtc/RecordRTC.min';
 
 import { GoogleCloudSpeechRecognitionService } from './google-cloud-speech-recognition.service';
 
-import { ISoundSource, IRecognitionLanguage, IProcessError, IGCRSError, IGCSRResult } from './google-cloud-speech-recognition.models';
+import {
+  ISoundSource, IRecognitionLanguage, IProcessError, IGCRSError, IRecognitionResults
+} from './google-cloud-speech-recognition.models';
 
 import { SHORT_RECORD_MAXIMUM, SOUND_SOURCES } from './google-cloud-speech-recognition.constants';
 
@@ -27,7 +29,7 @@ export const RTC_RECORD_CONFIG = {
 })
 export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy {
 
-  @Output() recognitionResults: EventEmitter<Array<IGCSRResult>> = new EventEmitter();
+  @Output() recognitionResults: EventEmitter<Array<IRecognitionResults>> = new EventEmitter();
   @Output() errorHandler: EventEmitter<IProcessError> = new EventEmitter();
 
   private unsubscribe$: ReplaySubject<any> = new ReplaySubject(1);
@@ -164,7 +166,7 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
         }, base64Data)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(
-        (results: Array<IGCSRResult>) => this.recognitionResults.next(results),
+        (results: Array<IRecognitionResults>) => this.recognitionResults.next(results),
         (error: IGCRSError) => {
           const errorOutput: IProcessError = {
             name: 'GCSR_ERROR',
