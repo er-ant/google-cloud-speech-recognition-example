@@ -66,8 +66,8 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
   }
 
   /**
-   * @method setLanguages
    * Sets languages and current language
+   * @method setLanguages
    */
   private setLanguages(): void {
     this.availableLanguages = [
@@ -90,8 +90,8 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
   }
 
   /**
-   * @method startShortRecording
    * Starts recording short audio
+   * @method startShortRecording
    */
   private startShortRecording(): void {
     from(navigator.mediaDevices.getUserMedia({ audio: true, video: false }))
@@ -131,8 +131,8 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
   }
 
   /**
-   * @method stopShortRecording
    * Stops recording short audio
+   * @method stopShortRecording
    */
   private stopShortRecording(): void {
     this.currentShortRecordingSeconds = 0;
@@ -153,8 +153,8 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
   }
 
   /**
-   * @method isAvailable
    * Returns if component is available for actions otherwise emits errors
+   * @method isAvailable
    */
   private isAvailable(): boolean {
     if (this.isShortRecording) {
@@ -196,16 +196,16 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
   }
 
   /**
-   * @method processShortRecording
    * Starts or stops recording short audio
+   * @method processShortRecording
    */
   processShortRecording(): void {
     this.isShortRecording ? this.stopShortRecording() : this.startShortRecording();
   }
 
   /**
-   * @method changeSoundSource
    * Change current sound source
+   * @method changeSoundSource
    */
   changeSoundSource(soundSource: ISoundSource): void {
     if (this.isAvailable()) {
@@ -217,8 +217,8 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
   }
 
   /**
-   * @method chooseLanguage
    * Choose language for further recognition
+   * @method chooseLanguage
    */
   chooseLanguage(language: IRecognitionLanguage): void {
     if (this.isAvailable()) {
@@ -230,8 +230,8 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
   }
 
   /**
-   * @method toggleLanguagesDropdown
    * Toggle languages dropdown
+   * @method toggleLanguagesDropdown
    */
   toggleLanguagesDropdown(): void {
     if (this.isAvailable()) {

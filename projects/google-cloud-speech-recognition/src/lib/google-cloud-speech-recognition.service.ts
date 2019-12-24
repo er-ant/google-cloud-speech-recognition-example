@@ -17,8 +17,8 @@ export class GoogleCloudSpeechRecognitionService {
               @Inject(GSCRConfig) private GSCRConfig: IGCSRServiceConfig) { }
 
   /**
-   * @method sendToGoogleShortRecord
    * Sends short record to google
+   * @method sendToGoogleShortRecord
    */
   sendToGoogleShortRecord(config: IGCSRConfigs, base64Data: string): Observable<Array<IRecognitionResults>> {
     const url: string = `https://speech.googleapis.com/v1/speech:recognize?key=${this.GSCRConfig.googleKey}`;
