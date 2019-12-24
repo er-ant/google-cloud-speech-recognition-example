@@ -1,4 +1,4 @@
-type SoundSource = 'micro' | 'stream';
+type SoundSource = 'microrecord' | 'stream';
 
 export interface IGCSRServiceConfig {
   googleKey: string;

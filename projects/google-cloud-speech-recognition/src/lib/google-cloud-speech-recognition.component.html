@@ -21,10 +21,9 @@
 </div>
 
 <ng-container [ngSwitch]="currentSoundSource.key">
-  <ng-container *ngSwitchCase="'micro'">
+  <ng-container *ngSwitchCase="'microrecord'">
     <div class="recognition-body">
       <div class="recognition-body__micro">
-        <!-- <audio id="player" controls></audio> -->
       </div>
       <div class="recognition-body__timer">
         00:{{ (currentShortRecordingSeconds || currentShortRecordingSeconds === 0) ? (currentShortRecordingSeconds | number: '2.0-0') : '00' }} / 00:30
