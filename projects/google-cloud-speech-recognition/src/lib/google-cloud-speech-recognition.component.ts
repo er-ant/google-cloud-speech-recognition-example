@@ -29,6 +29,8 @@ export const RTC_RECORD_CONFIG = {
 })
 export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy {
 
+  @Input() availableSoundSources: Array<ISoundSource> = SOUND_SOURCES;
+
   @Output() recognitionResults: EventEmitter<Array<IRecognitionResults>> = new EventEmitter();
   @Output() errorHandler: EventEmitter<IProcessError> = new EventEmitter();
 
@@ -36,19 +38,19 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
 
   private recordRTC: any;
 
-  readonly availableSoundSources: Array<ISoundSource> = SOUND_SOURCES;
   availableLanguages: Array<IRecognitionLanguage>;
-
-  recordingTimer: Subscription;
-
-  currentSoundSource: ISoundSource = this.availableSoundSources[0];
   currentLanguage: IRecognitionLanguage;
-
-  currentShortRecordingSeconds: number;
-  isShortRecording: boolean = false;
   languagesDropdownOpened: boolean = false;
 
+  currentSoundSource: ISoundSource = this.availableSoundSources[0];
+
   mediaStream: MediaStream;
+
+  isShortRecording: boolean = false;
+
+  // Short records part
+  recordingTimer: Subscription;
+  currentShortRecordingSeconds: number;
 
   constructor(private cdRef: ChangeDetectorRef,
               private gcsrService: GoogleCloudSpeechRecognitionService) {
@@ -239,5 +241,4 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
     this.languagesDropdownOpened = !this.languagesDropdownOpened;
     this.cdRef.detectChanges();
   }
-
 }
