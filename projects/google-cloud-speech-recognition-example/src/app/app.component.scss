@@ -1,5 +1,43 @@
 :host {
   display: flex;
+  flex-direction: column;
   height: 100%;
   width: 100%;
+}
+
+gcsr-component {
+  margin: 15px auto 0;
+}
+
+.gcsr-groups-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+  margin-top: 15px;
+  overflow-y: auto;
+
+  .gcsr-results-group {
+    &:not(:first-child) {
+      margin-top: 15px;
+    }
+  }
+}
+
+.gcsr-results-group {
+  border: 1px solid #e4da92;
+  margin: 0 auto;
+  padding: 10px;
+  width: 300px;
+
+  .gcsr-result {
+
+    &:not(:last-child) {
+      border-bottom: 1px dotted #e4da92;
+      padding-bottom: 5px;
+    }
+
+    &:not(:first-child) {
+      padding-top: 5px;
+    }
+  }
 }

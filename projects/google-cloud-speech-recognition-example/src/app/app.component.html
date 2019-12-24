@@ -1,1 +1,16 @@
-<gcsr-component></gcsr-component>
+<gcsr-component (recognitionResults)="gcsrResultsHandler($event)"></gcsr-component>
+<div class="gcsr-groups-container">
+  <div class="gcsr-results-group" *ngFor="let gcsrResultsGroup of gcsrResultsGroups">
+    <div class="gcsr-result__empty" *ngIf="gcsrResultsGroup.length === 0">
+      GCSR couldn't recognize your speech. Please, try again.
+    </div>
+    <div class="gcsr-result" *ngFor="let gcsrResult of gcsrResultsGroup; let i = index">
+      <div class="gcsr-result__header">
+        Result with confidence <span>{{ gcsrResult.confidence | number:'1.1-3' }}</span>:
+      </div>
+      <div class="gcsr-result__value">
+        {{ gcsrResult.transcript }}
+      </div>
+    </div>
+  </div>
+</div>
