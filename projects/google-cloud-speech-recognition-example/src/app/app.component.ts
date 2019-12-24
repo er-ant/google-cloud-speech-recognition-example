@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { IRecognitionResults } from 'projects/google-cloud-speech-recognition/src/public-api';
+import { IRecognitionResults, IProcessError } from 'projects/google-cloud-speech-recognition/src/public-api';
 
 @Component({
   selector: 'gcsr-example-root',
@@ -13,5 +13,9 @@ export class AppComponent {
 
   gcsrResultsHandler($event: Array<IRecognitionResults>): void {
     this.gcsrResultsGroups.unshift($event);
+  }
+
+  errorHandler($event: IProcessError): void {
+    alert($event.message);
   }
 }

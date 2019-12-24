@@ -1,4 +1,4 @@
-<gcsr-component (recognitionResults)="gcsrResultsHandler($event)"></gcsr-component>
+<gcsr-component (recognitionResults)="gcsrResultsHandler($event)" (errorHandler)="errorHandler($event)"></gcsr-component>
 <div class="gcsr-groups-container">
   <div class="gcsr-results-group" *ngFor="let gcsrResultsGroup of gcsrResultsGroups">
     <div class="gcsr-result__empty" *ngIf="gcsrResultsGroup.length === 0">
