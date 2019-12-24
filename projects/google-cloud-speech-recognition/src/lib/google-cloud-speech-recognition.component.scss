@@ -1,6 +1,4 @@
 :host {
-  height: 500px;
-  margin: auto;
   width: 300px;
 }
 
@@ -70,7 +68,6 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  height: 100px;
   justify-content: center;
 
   &__micro {
