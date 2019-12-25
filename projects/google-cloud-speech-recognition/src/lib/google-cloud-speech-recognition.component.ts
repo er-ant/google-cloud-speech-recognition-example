@@ -25,19 +25,26 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
 
   @Input() availableSoundSources: Array<ISoundSource> = DEFAULT_SOUND_SOURCES;
   @Input() availableLanguages: Array<IRecognitionLanguage> = DEFAULT_AVAILABLE_LANGUAGES;
-  @Input() GCSRConfigs: IGCSRConfigs = DEFAULT_GCSR_CONFIGS;
+  @Input() set gcsrConfigs(value: IGCSRConfigs) {
+    if (value) {
+      this.GCSRConfigs = {
+        ...DEFAULT_GCSR_CONFIGS,
+        ...value
+      };
+    }
+  }
 
   @Output() recognitionResults: EventEmitter<Array<IRecognitionResults>> = new EventEmitter();
   @Output() errorHandler: EventEmitter<IProcessError> = new EventEmitter();
 
   private unsubscribe$: ReplaySubject<any> = new ReplaySubject(1);
 
+  private recordRTC: any;
   private audioContext: AudioContext;
   private mediaStreamAudioNode: MediaStreamAudioSourceNode;
 
-  private recordRTC: any;
-
-  RTCConfigs: IRTCConfigs = DEFAULT_RTC_CONFIGS;
+  private RTCConfigs: IRTCConfigs = DEFAULT_RTC_CONFIGS;
+  private GCSRConfigs: IGCSRConfigs;
 
   currentLanguage: IRecognitionLanguage;
   languagesDropdownOpened: boolean = false;

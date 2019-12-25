@@ -9,6 +9,11 @@ import { IRecognitionResults, IProcessError } from 'projects/google-cloud-speech
 })
 export class AppComponent {
 
+  gcsrConfigs = {
+    maxAlternatives: 5,
+    profanityFilter: true
+  }
+
   gcsrResultsGroups: Array<Array<IRecognitionResults>> = [];
 
   gcsrResultsHandler($event: Array<IRecognitionResults>): void {

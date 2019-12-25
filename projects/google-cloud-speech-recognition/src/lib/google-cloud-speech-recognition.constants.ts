@@ -12,7 +12,6 @@ export const DEFAULT_RTC_CONFIGS: IRTCConfigs = {
 };
 
 export const DEFAULT_GCSR_CONFIGS: IGCSRConfigs = {
-  maxAlternatives: 5,
   sampleRateHertz: 44100,
   enableSeparateRecognitionPerChannel: false,
   profanityFilter: false,
