@@ -25,7 +25,6 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
 
   @Input() availableSoundSources: Array<ISoundSource> = DEFAULT_SOUND_SOURCES;
   @Input() availableLanguages: Array<IRecognitionLanguage> = DEFAULT_AVAILABLE_LANGUAGES;
-  @Input() RTCConfigs: IRTCConfigs = DEFAULT_RTC_CONFIGS;
   @Input() GCSRConfigs: IGCSRConfigs = DEFAULT_GCSR_CONFIGS;
 
   @Output() recognitionResults: EventEmitter<Array<IRecognitionResults>> = new EventEmitter();
@@ -33,7 +32,12 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
 
   private unsubscribe$: ReplaySubject<any> = new ReplaySubject(1);
 
+  private audioContext: AudioContext;
+  private mediaStreamAudioNode: MediaStreamAudioSourceNode;
+
   private recordRTC: any;
+
+  RTCConfigs: IRTCConfigs = DEFAULT_RTC_CONFIGS;
 
   currentLanguage: IRecognitionLanguage;
   languagesDropdownOpened: boolean = false;
@@ -70,6 +74,11 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(
         (mediaStream: MediaStream) => {
+          this.audioContext = new AudioContext();
+          this.mediaStreamAudioNode = this.audioContext.createMediaStreamSource(mediaStream);
+          // Take frequency and channels from current device
+          this.RTCConfigs.sampleRate = this.audioContext.sampleRate;
+          this.RTCConfigs.numberOfAudioChannels = this.mediaStreamAudioNode.channelCount;
           // Used RecordRTC with StereoAudioRecorder lib as another libs cannot provide audio/wav format
           // MediaStream always provide audio/webm
           this.recordRTC = RecordRTC(mediaStream, this.RTCConfigs);
@@ -119,7 +128,12 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
       });
 
       this.mediaStream.getAudioTracks().forEach((track: MediaStreamTrack) => track.stop());
+      this.audioContext.close();
+      this.mediaStreamAudioNode.disconnect();
+
       this.mediaStream = undefined;
+      this.audioContext = undefined;
+      this.mediaStreamAudioNode = undefined;
     });
     this.cdRef.detectChanges();
   }
@@ -145,8 +159,15 @@ export class GoogleCloudSpeechRecognitionComponent implements OnInit, OnDestroy 
    * @method googleProcessShortRecord
    */
   private googleProcessShortRecord(base64Data: string): void {
+    const GCSRConfigs: IGCSRConfigs = {
+      ...this.GCSRConfigs,
+      audioChannelCount: this.RTCConfigs.numberOfAudioChannels,
+      languageCode: this.currentLanguage.key,
+      sampleRateHertz: this.RTCConfigs.sampleRate
+    };
+
     this.GCSRService
-      .sendToGoogleShortRecord(this.GCSRConfigs, base64Data)
+      .sendToGoogleShortRecord(GCSRConfigs, base64Data)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(
         (results: Array<IRecognitionResults>) => this.recognitionResults.next(results),
